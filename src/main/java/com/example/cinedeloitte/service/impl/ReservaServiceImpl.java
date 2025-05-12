@@ -1,6 +1,8 @@
 package com.example.cinedeloitte.service.impl;
 
+import com.example.cinedeloitte.exception.InvalidReservationPeriodException;
 import com.example.cinedeloitte.exception.NotFoundException;
+import com.example.cinedeloitte.exception.RoomAlreadyReservedException;
 import com.example.cinedeloitte.mapper.ReservaMapper;
 import com.example.cinedeloitte.model.dto.ReservaRequestDTO;
 import com.example.cinedeloitte.model.dto.ReservaResponseDTO;
@@ -28,18 +30,18 @@ public class ReservaServiceImpl implements ReservaService {
     @Override
     public ReservaResponseDTO create(ReservaRequestDTO dto) {
         if (dto.getStartIn().isAfter(dto.getEndIn())) {
-            throw new IllegalArgumentException("Data/hora de início deve ser antes da de término.");
+            throw new InvalidReservationPeriodException("Data/hora de início deve ser antes da de término.");
         }
 
         if (dto.getStartIn().isBefore(OffsetDateTime.now())) {
-            throw new IllegalArgumentException("Não é possível reservar uma sala para o passado.");
+            throw new InvalidReservationPeriodException("Não é possível reservar uma sala para o passado.");
         }
 
         Sala sala = salaRepository.findById(dto.getSalaId())
                 .orElseThrow(() -> new NotFoundException("Sala com ID " + dto.getSalaId() + " não encontrada."));
 
         if(reservaRepository.existsBySalaIdAndPeriodOverlap(dto.getSalaId(),dto.getStartIn(),dto.getEndIn())) {
-            throw new IllegalArgumentException("Ja tem uma sala reservada nesse periodo de tempo");
+            throw new RoomAlreadyReservedException("Ja tem uma sala reservada nesse periodo de tempo");
         }
 
         Reserva reserva = mapper.toEntity(dto, sala);
