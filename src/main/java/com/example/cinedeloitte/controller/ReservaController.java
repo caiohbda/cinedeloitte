@@ -24,7 +24,7 @@ public class ReservaController {
         return ResponseEntity.status(201).body(reservaService.create(dto));
     }
 
-    @GetMapping
+    @GetMapping("/listar")
     public ResponseEntity<List<ReservaResponseDTO>> findAll() {
         return ResponseEntity.ok(reservaService.findAll());
     }

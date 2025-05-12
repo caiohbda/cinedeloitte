@@ -38,16 +38,15 @@ public class ReservaServiceImpl implements ReservaService {
         Sala sala = salaRepository.findById(dto.getSalaId())
                 .orElseThrow(() -> new NotFoundException("Sala com ID " + dto.getSalaId() + " não encontrada."));
 
-        boolean sobreposta = reservaRepository
-                .existsBySalaIdAndPeriodOverlap(sala.getId(), dto.getStartIn(), dto.getEndIn());
-
-        if (sobreposta) {
-            throw new IllegalArgumentException("A sala já está reservada nesse período.");
+        if(reservaRepository.existsBySalaIdAndPeriodOverlap(dto.getSalaId(),dto.getStartIn(),dto.getEndIn())) {
+            throw new IllegalArgumentException("Ja tem uma sala reservada nesse periodo de tempo");
         }
 
         Reserva reserva = mapper.toEntity(dto, sala);
         reserva.setSala(sala);
-        return mapper.toResponse(reservaRepository.save(reserva));
+        reserva = reservaRepository.save(reserva);
+
+        return mapper.toResponse(reserva);
     }
 
     @Override

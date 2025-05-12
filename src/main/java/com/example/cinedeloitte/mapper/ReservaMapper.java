@@ -13,6 +13,7 @@ public interface ReservaMapper {
     @Mapping(source = "sala", target = "sala")
     ReservaResponseDTO toResponse(Reserva reserva);
 
+    @Mapping(target = "id", ignore = true)
     @Mapping(source = "sala", target = "sala")
     Reserva toEntity(ReservaRequestDTO dto, Sala sala);
 }
